@@ -40,6 +40,7 @@ python3 -m pip install -r requirements.txt
 Run bot
    ```bash
    python bot.py
+   nohup python3 bot.py >> stdout.log &
    ```
 ## Configuration
 Create a config.json file in the root directory with the following structure:
