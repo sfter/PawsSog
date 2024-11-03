@@ -229,17 +229,28 @@ class PAWS:
                     time.sleep(2)
                 else:
                     return None
-        
-    def process_query(self, query: str, wallet: str):
-        
-        token = self.user_auth(query)
-        if not token:
-            self.log(
-                f"{Fore.MAGENTA+Style.BRIGHT}[ Token{Style.RESET_ALL}"
-                f"{Fore.RED+Style.BRIGHT} Is None {Style.RESET_ALL}"
-                f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
-            )
-            return
+
+    def save_token(self, id, token):
+        tokens = json.loads(open("tokens.json").read())
+        tokens[str(id)] = token
+        open("tokens.json", "w").write(json.dumps(tokens, indent=4))
+
+    def get_token(self, id):
+        tokens = json.loads(open("tokens.json").read())
+        if str(id) not in tokens.keys():
+            return None
+
+        return tokens[str(id)]
+
+    def process_query(self, query: str, wallet: str, id):
+
+        token = self.get_token(id)
+        if token is None:
+            token = self.user_auth(query)
+            if token is None:
+                return
+            self.save_token(id, token)
+
         
         if token:
             user = self.user_data(token)
@@ -400,7 +411,7 @@ class PAWS:
                         self.headers = get_headers(user_id)
 
                         try:
-                            self.process_query(query, wallet)
+                            self.process_query(query, wallet, user_id)
                         except Exception as e:
                             self.log(f"{Fore.RED + Style.BRIGHT}An error process_query: {e}{Style.RESET_ALL}")
 
