@@ -200,6 +200,79 @@ class PAWS:
         except Exception as e:
             print(e)
 
+    def connect_sol_wallet(self, token: str, wallet: str):        
+
+        url = 'https://api.paws.community/v1/user/sol-wallet'
+        data = json.dumps({'wallet': wallet})
+        self.headers.update({
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json'
+        })
+
+        try:
+            response = self.session.post(url, headers=self.headers, data=data)
+            response.raise_for_status()
+            result = response.json()
+            if result['success']:
+                self.log(Fore.GREEN + f"Successfully connected to sol wallet")
+                return
+            else:
+                self.log(Fore.RED + f"Failed connected to sol wallet")
+                return
+        except (requests.RequestException, ValueError) as e:
+                print(
+                    f"{Fore.RED+Style.BRIGHT}HTTP ERROR{Style.RESET_ALL}"
+                    f"{Fore.YELLOW+Style.BRIGHT} Retrying... {Style.RESET_ALL}",
+                    end="\r",
+                    flush=True
+                )
+        except Exception as e:
+            print(e)   
+
+        url = 'https://api.paws.community/v1/quests/completed'
+        data = json.dumps({'questId': "675f1a22410406ecf31bd57e"})
+        try:
+            response = self.session.post(url, headers=self.headers, data=data)
+            response.raise_for_status()
+            result = response.json()
+            if result['success']:
+                self.log(Fore.GREEN + f"Successfully connected to sol wallet")
+                return
+            else:
+                self.log(Fore.RED + f"Failed connected to sol wallet")
+                return
+        except (requests.RequestException, ValueError) as e:
+                print(
+                    f"{Fore.RED+Style.BRIGHT}HTTP ERROR{Style.RESET_ALL}"
+                    f"{Fore.YELLOW+Style.BRIGHT} Retrying... {Style.RESET_ALL}",
+                    end="\r",
+                    flush=True
+                )
+        except Exception as e:
+            print(e)        
+
+        url = 'https://api.paws.community/v1/quests/claim'
+        data = json.dumps({'questId': "675f1a22410406ecf31bd57e"})
+        try:
+            response = self.session.post(url, headers=self.headers, data=data)
+            response.raise_for_status()
+            result = response.json()
+            if result['success']:
+                self.log(Fore.GREEN + f"Successfully connected to sol wallet")
+                return
+            else:
+                self.log(Fore.RED + f"Failed connected to sol wallet")
+                return
+        except (requests.RequestException, ValueError) as e:
+                print(
+                    f"{Fore.RED+Style.BRIGHT}HTTP ERROR{Style.RESET_ALL}"
+                    f"{Fore.YELLOW+Style.BRIGHT} Retrying... {Style.RESET_ALL}",
+                    end="\r",
+                    flush=True
+                )
+        except Exception as e:
+            print(e)                               
+
     def claim_quests(self, token: str, quest_id: str, retries=5):
         url = 'https://api.paws.community/v1/quests/claim'
         data = json.dumps({'questId':quest_id})
@@ -230,7 +303,7 @@ class PAWS:
                 else:
                     return None
         
-    def process_query(self, query: str, wallet: str):
+    def process_query(self, query: str, wallet: str, sol_wallet: str):
         
         token = self.user_auth(query)
         if not token:
@@ -258,6 +331,13 @@ class PAWS:
                 if wallet:
                     self.connect_wallet(token, wallet)
                     countdown_timer(random.randint(min(account_delay), max(account_delay)))
+
+                self.log(sol_wallet)
+                if sol_wallet:
+                    try:
+                        self.connect_sol_wallet(token, sol_wallet)
+                    except Exception as e:
+                        self.log(f"{Fore.RED + Style.BRIGHT}An error sol connect sol wallet: {e}{Style.RESET_ALL}")          
 
                 quests = self.quest_lists(token)
                 if quests:
@@ -347,7 +427,8 @@ class PAWS:
                 proxies = [line.strip() for line in file if line.strip()]
             with open('wallets.txt', 'r') as file:
                 wallets = [line.strip() for line in file if line.strip()]
-
+            with open('sol_wallets.txt', 'r') as file:
+                sol_wallets = [line.strip() for line in file if line.strip()]
 
             while True:
                 self.log(
@@ -396,12 +477,26 @@ class PAWS:
                         else:
                             wallet = None
 
+                        if config['connect_sol_wallets']:
+                            if len(sol_wallets) >= len(queries):
+                                sol_wallet = sol_wallets[i]
+                                self.log(
+                                    f"{Fore.GREEN + Style.BRIGHT}Connect sol wallet:{Style.RESET_ALL}"
+                                    f"{Fore.WHITE + Style.BRIGHT}{wallet}{Style.RESET_ALL}"
+                                )
+
+                            else:
+                                self.log(Fore.RED + "The number of sol wallets is less than the number of accounts. The connection of sol wallets is disabled!")
+                                sol_wallet = None
+                        else:
+                            sol_wallet = None                            
+
                         user_info = extract_user_data(query)
                         user_id = str(user_info.get('id'))
                         self.headers = get_headers(user_id)
 
                         try:
-                            self.process_query(query, wallet)
+                            self.process_query(query, wallet, sol_wallet)
                         except Exception as e:
                             self.log(f"{Fore.RED + Style.BRIGHT}An error process_query: {e}{Style.RESET_ALL}")
 
