@@ -130,6 +130,158 @@ class PAWS:
                 else:
                     return None
 
+    def quest_christmas_lists(self, token: str, retries=5):
+        url = 'https://api.paws.community/v1/quests/list?type=christmas'
+        self.headers.update({
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json'
+        })
+
+        for attempt in range(retries):
+            try:
+                response = self.session.get(url, headers=self.headers)
+                response.raise_for_status()
+                result = response.json()
+                if result['success']:
+                    return result['data']
+                else:
+                    return None
+            except (requests.RequestException, ValueError) as e:
+                if attempt < retries - 1:
+                    print(
+                        f"{Fore.RED+Style.BRIGHT}HTTP ERROR{Style.RESET_ALL}"
+                        f"{Fore.YELLOW+Style.BRIGHT} Retrying... {Style.RESET_ALL}"
+                        f"{Fore.WHITE+Style.BRIGHT}[{attempt+1}/{retries}]{Style.RESET_ALL}",
+                        end="\r",
+                        flush=True
+                    )
+                    time.sleep(2)
+                else:
+                    return None
+
+    def process_christmas_quest_new(self, token:str):
+        # quests = self.quest_lists(token)
+        # if quests:
+        #     for quest in quests:
+        #         quest_id = quest['_id']
+        #         self.start_quests(token, quest_id)
+        #         time.sleep(1)
+        #         self.claim_quests(token, quest_id)
+        #         time.sleep(1)
+
+        quest_id = "6768c21f2e171c1a4d8e3df1"
+        self.start_quests(token, quest_id)
+        time.sleep(1)
+        self.claim_quests(token, quest_id)
+        time.sleep(1)
+
+        quest_id = "6768c22d2e171c1a4d8e3df3"
+        self.start_quests(token, quest_id)
+        time.sleep(3)
+        self.claim_quests(token, quest_id)
+        time.sleep(3)
+
+        quest_id = "6768c30f2e171c1a4d8e3df5"
+        self.start_quests(token, quest_id)
+        time.sleep(2)
+        self.claim_quests(token, quest_id)
+        time.sleep(2)
+
+        quest_id = "6768c3242e171c1a4d8e3df8"
+        self.start_quests(token, quest_id)
+        time.sleep(2)
+        self.claim_quests(token, quest_id)
+        time.sleep(2)
+
+        # quest_id = "6768c3312e171c1a4d8e3dfa"
+        # self.start_quests(token, quest_id)
+        # time.sleep(1)
+        # self.claim_quests(token, quest_id)
+        # time.sleep(1)
+
+        # quest_id = "6768c3402e171c1a4d8e3dfc"
+        # self.start_quests(token, quest_id)
+        # time.sleep(3)
+        # self.claim_quests(token, quest_id)
+        # time.sleep(3)
+
+    def process_christmas_quest(self, token:str, account_delay:int):
+        quests = self.quest_christmas_lists(token)
+        if quests:
+            for quest in quests:
+                quest_id = quest['_id']
+                rewards = quest.get('rewards', [])
+                amount = rewards[0]['amount'] if rewards and 'amount' in rewards[0] else None
+
+                current_progress = quest['progress']['current']
+                total_progress = quest['progress']['total']
+                claimed = quest['progress']['claimed']
+
+                if quest and not claimed:
+                
+                    if current_progress != total_progress:
+                        start = self.start_quests(token, quest_id)
+                        time.sleep(1)
+                        if start:
+                            self.log(
+                                f"{Fore.MAGENTA+Style.BRIGHT}[ Quest{Style.RESET_ALL}"
+                                f"{Fore.WHITE+Style.BRIGHT} {quest['title']} {Style.RESET_ALL}"
+                                f"{Fore.GREEN+Style.BRIGHT}Is Started{Style.RESET_ALL}"
+                                f"{Fore.MAGENTA+Style.BRIGHT} ]{Style.RESET_ALL}"
+                            )
+                            countdown_timer(random.randint(min(account_delay), max(account_delay)))
+
+                            claim = self.claim_quests(token, quest_id)
+                            time.sleep(1)
+                            if claim:
+                                self.log(
+                                    f"{Fore.MAGENTA+Style.BRIGHT}[ Quest{Style.RESET_ALL}"
+                                    f"{Fore.WHITE+Style.BRIGHT} {quest['title']} {Style.RESET_ALL}"
+                                    f"{Fore.GREEN+Style.BRIGHT}Is Claimed{Style.RESET_ALL}"
+                                    f"{Fore.MAGENTA+Style.BRIGHT} ] [ Reward{Style.RESET_ALL}"
+                                    f"{Fore.WHITE+Style.BRIGHT} {amount} $PAWS {Style.RESET_ALL}"
+                                    f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+                                )
+                            else:
+                                self.log(
+                                    f"{Fore.MAGENTA+Style.BRIGHT}[ Quest{Style.RESET_ALL}"
+                                    f"{Fore.WHITE+Style.BRIGHT} {quest['title']} {Style.RESET_ALL}"
+                                    f"{Fore.RED+Style.BRIGHT}Isn't Claimed{Style.RESET_ALL}"
+                                    f"{Fore.MAGENTA+Style.BRIGHT} ]{Style.RESET_ALL}"
+                                )
+                        else:
+                            self.log(
+                                f"{Fore.MAGENTA+Style.BRIGHT}[ Quest{Style.RESET_ALL}"
+                                f"{Fore.WHITE+Style.BRIGHT} {quest['title']} {Style.RESET_ALL}"
+                                f"{Fore.RED+Style.BRIGHT}Isn't Started{Style.RESET_ALL}"
+                                f"{Fore.MAGENTA+Style.BRIGHT} ]{Style.RESET_ALL}"
+                            )
+
+                    else:
+                        claim = self.claim_quests(token, quest_id)
+                        if claim:
+                            self.log(
+                                f"{Fore.MAGENTA+Style.BRIGHT}[ Quest{Style.RESET_ALL}"
+                                f"{Fore.WHITE+Style.BRIGHT} {quest['title']} {Style.RESET_ALL}"
+                                f"{Fore.GREEN+Style.BRIGHT}Is Claimed{Style.RESET_ALL}"
+                                f"{Fore.MAGENTA+Style.BRIGHT} ] [ Reward{Style.RESET_ALL}"
+                                f"{Fore.WHITE+Style.BRIGHT} {amount} $PAWS {Style.RESET_ALL}"
+                                f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+                            )
+                        else:
+                            self.log(
+                                f"{Fore.MAGENTA+Style.BRIGHT}[ Quest{Style.RESET_ALL}"
+                                f"{Fore.WHITE+Style.BRIGHT} {quest['title']} {Style.RESET_ALL}"
+                                f"{Fore.RED+Style.BRIGHT}Isn't Claimed{Style.RESET_ALL}"
+                                f"{Fore.MAGENTA+Style.BRIGHT} ]{Style.RESET_ALL}"
+                            )
+        else:
+            self.log(
+                f"{Fore.MAGENTA+Style.BRIGHT}[ Quest{Style.RESET_ALL}"
+                f"{Fore.RED+Style.BRIGHT} Is None {Style.RESET_ALL}"
+                f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+            )                      
+                
     def set_proxy(self, proxy):
         self.session.proxies = {
             "http": proxy,
@@ -286,8 +438,12 @@ class PAWS:
                 response = self.session.post(url, headers=self.headers, data=data)
                 response.raise_for_status()
                 result = response.json()
+                print(result)
                 if result['success']:
-                    return result['data']
+                    if result.get("data"):
+                        return result['data']
+                    else:
+                        return None
                 else:
                     return None
             except (requests.RequestException, ValueError) as e:
@@ -338,6 +494,8 @@ class PAWS:
                         self.connect_sol_wallet(token, sol_wallet)
                     except Exception as e:
                         self.log(f"{Fore.RED + Style.BRIGHT}An error sol connect sol wallet: {e}{Style.RESET_ALL}")          
+
+                self.process_christmas_quest_new(token)
 
                 quests = self.quest_lists(token)
                 if quests:
