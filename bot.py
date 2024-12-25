@@ -169,41 +169,46 @@ class PAWS:
         #         self.claim_quests(token, quest_id)
         #         time.sleep(1)
 
-        quest_id = "6768c21f2e171c1a4d8e3df1"
-        self.start_quests(token, quest_id)
-        time.sleep(1)
-        self.claim_quests(token, quest_id)
-        time.sleep(1)
 
-        quest_id = "6768c22d2e171c1a4d8e3df3"
-        self.start_quests(token, quest_id)
-        time.sleep(3)
-        self.claim_quests(token, quest_id)
-        time.sleep(3)
 
-        quest_id = "6768c30f2e171c1a4d8e3df5"
-        self.start_quests(token, quest_id)
-        time.sleep(2)
-        self.claim_quests(token, quest_id)
-        time.sleep(2)
-
-        quest_id = "6768c3242e171c1a4d8e3df8"
-        self.start_quests(token, quest_id)
-        time.sleep(2)
-        self.claim_quests(token, quest_id)
-        time.sleep(2)
-
-        # quest_id = "6768c3312e171c1a4d8e3dfa"
+        # quest_id = "6768c21f2e171c1a4d8e3df1"
         # self.start_quests(token, quest_id)
         # time.sleep(1)
         # self.claim_quests(token, quest_id)
         # time.sleep(1)
 
-        # quest_id = "6768c3402e171c1a4d8e3dfc"
+        # quest_id = "6768c22d2e171c1a4d8e3df3"
         # self.start_quests(token, quest_id)
         # time.sleep(3)
         # self.claim_quests(token, quest_id)
         # time.sleep(3)
+
+        # quest_id = "6768c30f2e171c1a4d8e3df5"
+        # self.start_quests(token, quest_id)
+        # time.sleep(2)
+        # self.claim_quests(token, quest_id)
+        # time.sleep(2)
+
+        # quest_id = "6768c3242e171c1a4d8e3df8"
+        # self.start_quests(token, quest_id)
+        # time.sleep(2)
+        # self.claim_quests(token, quest_id)
+        # time.sleep(2)
+
+        
+
+        quest_id = "6768c3312e171c1a4d8e3dfa"
+        self.start_quests(token, quest_id)
+        time.sleep(1)
+        self.claim_quests(token, quest_id)
+        time.sleep(1)
+
+
+        quest_id = "6768c3402e171c1a4d8e3dfc"
+        self.start_quests(token, quest_id)
+        time.sleep(3)
+        self.claim_quests(token, quest_id)
+        time.sleep(3)
 
     def process_christmas_quest(self, token:str, account_delay:int):
         quests = self.quest_christmas_lists(token)
