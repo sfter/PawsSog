@@ -476,7 +476,8 @@ class PAWS:
             return
         
         if token:
-            user = self.user_data(token)
+            userInfo = self.user_data(token)
+            user = userInfo["user"]
             if user:
                 self.log(
                     f"{Fore.MAGENTA+Style.BRIGHT}[ Account{Style.RESET_ALL}"
